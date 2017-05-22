@@ -1,0 +1,1 @@
+Le programme est fonctionnel sauf pour certaines exceptions tel que les verbes à particule comme s'amuser par exemple

@@ -1,0 +1,473 @@
+ALGO conjugaison
+//BUT utiliser des fichiers afin de conjuguer des verbes
+//ENTREE verbe à conjuguer
+//SORTIE verbe conjugué au présent de l'indicatif
+
+//PROCEDURE ET FONCTION
+
+procedure affiche_fichier(f:text)
+//BUT afficher le contenue d'un fichier
+//ENTREE le fichier à afficher
+//SORTIE le contenu du fichier
+
+var
+	ch:chaine
+DEBUT
+	//vérification que le fichier existe
+	{$I-}
+	ouvrir(f)
+	{$I+}
+	//Si il n'existe pas alors on affiche une érreur sinon on affiche les fiches
+	SI (IOResult <> 0) ALORS
+		ECRIRE"Ce fichier n'existe pas."
+	SINON
+		ouvrir(f)
+		//tant que la fin du fichier n'est pas atteinte on afficher son contenu
+		TANTQUE NON Eof(f) FAIRE
+			LIRE(f,ch)
+			ECRIRE ch
+		FINTANTQUE
+		//on ferme le fichier
+		fermer(f)
+	FINSI
+FINPROCEDURE
+
+procedure initfichier()
+//BUT initialiser le fichier
+//ENTREE aucune
+//SORTIE le fichier initialisé
+var
+	f:TextFile
+	ch:chaine
+DEBUT
+	Assigner(f,'Liste_de_verbe.txt')
+	{$I-}
+	ouvrir(f)
+	{$I+}
+	//Si il n'existe pas alors on le crée et on le remplie
+	SI (IOResult <> 0) ALORS
+		reecrire(f);
+		ch<-'rire'
+		ECRIRE(f,ch)
+		ch<-'recevoire'
+		ECRIRE(f,ch)
+		ch<-'aller'
+		ECRIRE(f,ch)
+		ch<-'bouillir'
+		ECRIRE(f,ch)
+		ch<-'envoyer'
+		ECRIRE(f,ch)
+		ch<-'peindre'
+		ECRIRE(f,ch)
+		ch<-'habiter'
+		ECRIRE(f,ch)
+		ch<-'payer'
+		ECRIRE(f,ch)
+		ch<-'mourir'
+		ECRIRE(f,ch)
+		ch<-'hair'
+		ECRIRE(f,ch)
+		ch<-'vouloir'
+		ECRIRE(f,ch)
+		ch<-'finir'
+		ECRIRE(f,ch)
+		ch<-'s'amuser'
+		ECRIRE(f,ch)
+		fermer(f)
+	FINSI
+FINPROCEDURE
+
+fonction determine_groupe(ch:chaine)
+//BUT déterminer le groupe d'un verbe
+//ENTREE le verbe
+//SORTIE le numéro de son groupe
+
+var
+	numgroupe:entier
+	terminaison:chaine
+	f:TextFile
+	s:chaine
+	test:booleen
+DEBUT
+	test<-faux
+	SI ch=aller ALORS
+		numgroupe<-3
+	SINON
+		terminaison<-EXTRACTION(ch,longueur(ch)-1,2)
+		SI teminaison='er' ALORS	
+			numgroupe<-1
+		SINON
+			assigner(f,'liste_ir_3_groupe.txt')
+			ouvrir(f)
+			TANTQUE NON Eof(f) FAIRE
+				LIRE(f,s)
+				SI s=ch ALORS
+					test<-vrai
+				FINSI
+			FINTANTQUE
+			SI terminaison='ir' et test=faux et ch[longueur(ch)-2]<>'o' ALORS
+				numgroupe<-2
+			SINON
+				numgroupe<-3
+			FINSI
+		FINSI
+	FINSI
+	determine_groupe<-numgroupe
+FINFONCTION
+
+procedure conjug(verbe:chaine);
+//BUT conjuguer un verbe
+//ENTREE le verbe
+//SORTIE le verbe conjuguer
+
+var
+	f:text
+	numgroupe:entier
+	ch,radical:chaine
+DEBUT
+	numgroupe:=determine_groupe(verbe);
+	Assigner(f,'Liste_de_verbe_conj.txt')
+	{$I-}
+	ouvrir(f)
+	{$I+}
+	SI (IOResult <> 0) ALORS
+		reecrire(f)
+			SI numgroupe=1 ALORS
+				ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+				ECRIRE(f,ch);
+				radical<-EXTRACTION(verbe,1,length(verbe)+2)
+				si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+					ch<-'j''+radical+'e'
+				sinon
+					ch<-'je '+radical+'e'
+				finsi
+				ECRIRE(f,ch)
+				ch<-'tu '+radical+'es'
+				ECRIRE<-(f,ch)
+				ch<-'il/elle/on '+radical+'e'
+				ECRIRE<-(f,ch)
+				si radical[length(radical)]='c' alors
+					radical<-extraction(radical,1,length(radical)-1)
+					ch<-'Nous '+radical+'çons'
+					radical<-EXTRACTION(verbe,1,length(verbe)-2)
+				sinon
+					si radical[length(radical)]='g' alors
+						ch<-'Nous '+radical+'eons'
+					sinon
+						ch<-'Nous '+radical+'ons'
+					finsi
+				finsi
+				ECRIRE(f,ch)
+				ch<-'Vous '+radical+'ez'
+				ECRIRE(f,ch)
+				ch<-'Ils/elles '+radical+'ent'
+				ECRIRE(f,ch)
+			sinon
+				SI numgroupe=2 ALORS
+					ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+					ECRIRE(f,ch);
+					radical<-EXTRACTION(verbe,1,length(verbe)-2)
+					si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+						ch<-'j''+radical+'is'
+					sinon
+						ch<-'je '+radical+'is'
+					finsi
+					ECRIRE(f,ch)
+					ch<-'tu '+radical+'is'
+					ECRIRE<-(f,ch)
+					ch<-'il/elle/on '+radical+'it'
+					ECRIRE<-(f,ch)	
+					ch<-'Nous '+radical+'issons'
+					ECRIRE(f,ch)
+					ch<-'Vous '+radical+'issez'
+					ECRIRE(f,ch)
+					ch<-'Ils/elles '+radical+'issent'
+					ECRIRE(f,ch)
+				sinon
+					si verbe='aller' alors
+						ch:=(verbe,' verbe du groupe 3 :')
+						ECRIRE(f,ch);
+						ch<-'je vais'
+						ECRIRE(f,ch)
+						ch<-'tu vas'
+						ECRIRE(f,ch)
+						ch<-'il/elle/on va'
+						ECRIRE(f,ch)
+						ch<-'nous allons'
+						ECRIRE(f,ch)
+						ch<-'vous allez'
+						ECRIRE(f,ch)
+						ch<-'ils/elles vont'
+						ECRIRE(f,ch)
+					sinon
+						si	verbe='recevoir' alors
+							ch:=(verbe,' verbe du groupe 3 :')
+							ECRIRE(f,ch);
+							ch<-'je reçois'
+							ECRIRE(f,ch)
+							ch<-'tu reçois'
+							ECRIRE(f,ch)
+							ch<-'il/elle/on reçoit'
+							ECRIRE(f,ch)
+							ch<-'nous recevons'
+							ECRIRE(f,ch)
+							ch<-'vous recevez'
+							ECRIRE(f,ch)
+							ch<-'ils/elles reçoivent'
+							ECRIRE(f,ch)	
+						sinon
+							si verbe='bouillir' alors
+								ch:=(verbe,' verbe du groupe 3 :')
+								ECRIRE(f,ch);
+								ch<-'je bous'
+								ECRIRE(f,ch)
+								ch<-'tu bous'
+								ECRIRE(f,ch)
+								ch<-'il/elle/on bout'
+								ECRIRE(f,ch)
+								ch<-'nous bouillons'
+								ECRIRE(f,ch)
+								ch<-'vous bouillez'
+								ECRIRE(f,ch)
+								ch<-'ils/elles bouillent'
+								ECRIRE(f,ch)
+							sinon
+								si verbe='mourir' alors
+									ch:=(verbe,' verbe du groupe 3 :')
+									ECRIRE(f,ch);
+									ch<-'je meurs'
+									ECRIRE(f,ch)
+									ch<-'tu meurs'
+									ECRIRE(f,ch)
+									ch<-'il/elle/on meurt'
+									ECRIRE(f,ch)
+									ch<-'nous mourons'
+									ECRIRE(f,ch)
+									ch<-'vous mourez'
+									ECRIRE(f,ch)
+									ch<-'ils/elles meurent'
+									ECRIRE(f,ch)
+								sinon
+									si verbe='vouloir' alors
+										ch:=(verbe,' verbe du groupe 3 :')
+										ECRIRE(f,ch);
+										ch<-'je veux'
+										ECRIRE(f,ch)
+										ch<-'tu veux'
+										ECRIRE(f,ch)
+										ch<-'il/elle/on veut'
+										ECRIRE(f,ch)
+										ch<-'nous voulons'
+										ECRIRE(f,ch)
+										ch<-'vous voulez'
+										ECRIRE(f,ch)
+										ch<-'ils/elles veulent'
+										ECRIRE(f,ch)
+									sinon
+										ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+										ECRIRE(f,ch);
+										radical<-EXTRACTION(verbe,1,length(verbe)-2)
+										si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+											ch<-'j''+radical+'s'
+										sinon
+											ch<-'je '+radical+'s'
+										finsi
+										ECRIRE(f,ch)
+										ch<-'tu '+radical+'s'
+										ECRIRE<-(f,ch)
+										ch<-'il/elle/on '+radical+'t'
+										ECRIRE<-(f,ch)	
+										ch<-'Nous '+radical+'ons'
+										ECRIRE(f,ch)
+										ch<-'Vous '+radical+'ez'
+										ECRIRE(f,ch)
+										ch<-'Ils/elles '+radical+'ent'
+										ECRIRE(f,ch)
+									finsi
+								finsi
+							finsi
+						finsi
+					finsi
+				finsi
+			finsi
+		fermer(f)
+	SINON
+		ajouter(f)
+			SI numgroupe=1 ALORS
+				ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+				ECRIRE(f,ch);
+				radical<-EXTRACTION(verbe,1,length(verbe)+2)
+				si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+					ch<-'j''+radical+'e'
+				sinon
+					ch<-'je '+radical+'e'
+				finsi
+				ECRIRE(f,ch)
+				ch<-'tu '+radical+'es'
+				ECRIRE<-(f,ch)
+				ch<-'il/elle/on '+radical+'e'
+				ECRIRE<-(f,ch)
+				si radical[length(radical)]='c' alors
+					radical<-extraction(radical,1,length(radical)-1)
+					ch<-'Nous '+radical+'çons'
+					radical<-EXTRACTION(verbe,1,length(verbe)-2)
+				sinon
+					si radical[length(radical)]='g' alors
+						ch<-'Nous '+radical+'eons'
+					sinon
+						ch<-'Nous '+radical+'ons'
+					finsi
+				finsi
+				ECRIRE(f,ch)
+				ch<-'Vous '+radical+'ez'
+				ECRIRE(f,ch)
+				ch<-'Ils/elles '+radical+'ent'
+				ECRIRE(f,ch)
+			sinon
+				SI numgroupe=2 ALORS
+					ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+					ECRIRE(f,ch);
+					radical<-EXTRACTION(verbe,1,length(verbe)-2)
+					si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+						ch<-'j''+radical+'is'
+					sinon
+						ch<-'je '+radical+'is'
+					finsi
+					ECRIRE(f,ch)
+					ch<-'tu '+radical+'is'
+					ECRIRE<-(f,ch)
+					ch<-'il/elle/on '+radical+'it'
+					ECRIRE<-(f,ch)	
+					ch<-'Nous '+radical+'issons'
+					ECRIRE(f,ch)
+					ch<-'Vous '+radical+'issez'
+					ECRIRE(f,ch)
+					ch<-'Ils/elles '+radical+'issent'
+					ECRIRE(f,ch)
+				sinon
+					si verbe='aller' alors
+						ch:=(verbe,' verbe du groupe 3 :')
+						ECRIRE(f,ch);
+						ch<-'je vais'
+						ECRIRE(f,ch)
+						ch<-'tu vas'
+						ECRIRE(f,ch)
+						ch<-'il/elle/on va'
+						ECRIRE(f,ch)
+						ch<-'nous allons'
+						ECRIRE(f,ch)
+						ch<-'vous allez'
+						ECRIRE(f,ch)
+						ch<-'ils/elles vont'
+						ECRIRE(f,ch)
+					sinon
+						si	verbe='recevoir' alors
+							ch:=(verbe,' verbe du groupe 3 :')
+							ECRIRE(f,ch);
+							ch<-'je reçois'
+							ECRIRE(f,ch)
+							ch<-'tu reçois'
+							ECRIRE(f,ch)
+							ch<-'il/elle/on reçoit'
+							ECRIRE(f,ch)
+							ch<-'nous recevons'
+							ECRIRE(f,ch)
+							ch<-'vous recevez'
+							ECRIRE(f,ch)
+							ch<-'ils/elles reçoivent'
+							ECRIRE(f,ch)	
+						sinon
+							si verbe='bouillir' alors
+								ch:=(verbe,' verbe du groupe 3 :')
+								ECRIRE(f,ch);
+								ch<-'je bous'
+								ECRIRE(f,ch)
+								ch<-'tu bous'
+								ECRIRE(f,ch)
+								ch<-'il/elle/on bout'
+								ECRIRE(f,ch)
+								ch<-'nous bouillons'
+								ECRIRE(f,ch)
+								ch<-'vous bouillez'
+								ECRIRE(f,ch)
+								ch<-'ils/elles bouillent'
+								ECRIRE(f,ch)
+							sinon
+								si verbe='mourir' alors
+									ch:=(verbe,' verbe du groupe 3 :')
+									ECRIRE(f,ch);
+									ch<-'je meurs'
+									ECRIRE(f,ch)
+									ch<-'tu meurs'
+									ECRIRE(f,ch)
+									ch<-'il/elle/on meurt'
+									ECRIRE(f,ch)
+									ch<-'nous mourons'
+									ECRIRE(f,ch)
+									ch<-'vous mourez'
+									ECRIRE(f,ch)
+									ch<-'ils/elles meurent'
+									ECRIRE(f,ch)
+								sinon
+									si verbe='vouloir' alors
+										ch:=(verbe,' verbe du groupe 3 :')
+										ECRIRE(f,ch);
+										ch<-'je veux'
+										ECRIRE(f,ch)
+										ch<-'tu veux'
+										ECRIRE(f,ch)
+										ch<-'il/elle/on veut'
+										ECRIRE(f,ch)
+										ch<-'nous voulons'
+										ECRIRE(f,ch)
+										ch<-'vous voulez'
+										ECRIRE(f,ch)
+										ch<-'ils/elles veulent'
+										ECRIRE(f,ch)
+									sinon
+										ch:=(verbe,' verbe du groupe ',numgroupe,' :')
+										ECRIRE(f,ch);
+										radical<-EXTRACTION(verbe,1,length(verbe)-2)
+										si radical[1]='a' or radical[1]='e' or radical[1]='i' or radical[1]='o' or radical[1]='u' or radical[1]='y' ALORS
+											ch<-'j''+radical+'s'
+										sinon
+											ch<-'je '+radical+'s'
+										finsi
+										ECRIRE(f,ch)
+										ch<-'tu '+radical+'s'
+										ECRIRE<-(f,ch)
+										ch<-'il/elle/on '+radical+'t'
+										ECRIRE<-(f,ch)	
+										ch<-'Nous '+radical+'ons'
+										ECRIRE(f,ch)
+										ch<-'Vous '+radical+'ez'
+										ECRIRE(f,ch)
+										ch<-'Ils/elles '+radical+'ent'
+										ECRIRE(f,ch)
+									finsi
+								finsi
+							finsi
+						finsi
+					finsi
+				finsi
+			finsi
+		fermer(f)
+	FINSI
+FINPROCEDURE
+
+//PROG PRINCIPAL
+
+var
+	f,g:Text
+	ch:chaine
+	nb:entier
+DEBUT
+	initfichier()
+	Assigner(f,'Liste_de_verbe.txt')
+	affiche_fichier(f)
+	ECRIRE('Choisissez un verbe')
+	LIRE(ch)
+	conjug(ch)
+	assigner(g,'Liste_de_verbe_conj.txt')
+	affiche_fichier(g)
+FIN
